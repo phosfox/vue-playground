@@ -8,7 +8,7 @@
     <p>{{ second.isValid }}</p>
   </div>
   <div>
-    <p>Both Short than 5</p>
+    <p>Short than 5</p>
     {{ isValid }}
   </div>
 </template>
@@ -49,12 +49,12 @@ export default defineComponent({
     //   value: "",
     //   validators: [shorterThan5],
     // })
-    const f1: Field<string> = { value: "", validators: [shorterThan5] }
-    const f2: Field<string> = { value: "", validators: [shorterThan5] }
+    const f1: Field<string> = { value: "", validators: [shorterThan5], name: "first" }
+    const f2: Field<string> = { value: "", validators: [shorterThan5], name: "second" }
     const form: Form<string> = { fields: [f1, f2] }
     const {
       isValid,
-      fields: [first, second],
+      fields: {first, second},
     } = useForm<string>(form)
     return { isValid, first, second }
   },
