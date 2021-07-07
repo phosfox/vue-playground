@@ -1,42 +1,64 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <input type="text" v-model="first.value" />
+    <p>Short than 5</p>
+    <p>{{ first.isValid }}</p>
+    <input type="text" v-model="second.value" />
+    <p>Short than 5</p>
+    <p>{{ second.isValid }}</p>
+  </div>
+  <div>
+    <p>Both Short than 5</p>
+    {{ isValid }}
   </div>
 </template>
 
-<script>
-export default {
-  name: 'HelloWorld',
+<script lang="ts">
+import { defineComponent, Ref } from "vue"
+import { Validator, Field, useForm, Form } from "../composables/useField"
+
+export default defineComponent({
+  name: "HelloWorld",
   props: {
-    msg: String
-  }
-}
+    msg: String,
+  },
+  setup() {
+    const shorterThan5: Validator<string> = (x) => {
+      if (x && x.trim().length < 5) {
+        return true
+      }
+      return false
+    }
+
+    function isLongerThan(otherField: Field<string>): Validator<string> {
+      return (thisVal: string) => thisVal.length > otherField.value.length
+    }
+    console.log(isLongerThan)
+
+    function isLongerThan2(otherVal: Ref<string>): Validator<string> {
+      return (thisVal: string) => thisVal.length > otherVal.value.length
+    }
+    console.log(isLongerThan2)
+
+    // const { isValid, value, ...field } = useField({
+    //   value: "",
+    //   validators: [shorterThan5],
+    // })
+
+    // const { isValid: otherIsValid, value: otherVal } = useField({
+    //   value: "",
+    //   validators: [shorterThan5],
+    // })
+    const f1: Field<string> = { value: "", validators: [shorterThan5] }
+    const f2: Field<string> = { value: "", validators: [shorterThan5] }
+    const form: Form<string> = { fields: [f1, f2] }
+    const {
+      isValid,
+      fields: [first, second],
+    } = useForm<string>(form)
+    return { isValid, first, second }
+  },
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
